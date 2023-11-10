@@ -32,22 +32,22 @@ public class MiPrograma {
 
                 switch (opcion) {
                     case 1:
-                        // Añadir detalle de producto
+                        / Añadir detalle de producto
                         System.out.println("Introduzca el código del producto:");
-                        String productCode = System.console().readLine();
+                        String cproducto = System.console().readLine();
                         System.out.println("Introduzca la cantidad:");
-                        int quantity = Integer.parseInt(System.console().readLine());
+                        int cantidad = Integer.parseInt(System.console().readLine());
 
                         // Comprobar si hay suficiente stock
-                        rs = stmt.executeQuery("SELECT stock FROM stock WHERE product_code = '" + productCode + "'");
+                        rs = stmt.executeQuery("SELECT stock FROM stock WHERE cproducto = '" + cproducto + "'");
                         if (rs.next()) {
                             int stock = rs.getInt(1);
-                            if (stock >= quantity) {
+                            if (stock >= cantidad) {
                                 // Actualizar Stock
-                                stmt.executeUpdate("UPDATE stock SET stock = stock - " + quantity + " WHERE product_code = '" + productCode + "'");
+                                stmt.executeUpdate("UPDATE stock SET stock = stock - " + cantidad + " WHERE cproducto = '" + cproducto + "'");
 
                                 // Insert en Detalle-Pedido
-                                stmt.executeUpdate("INSERT INTO detallepedido (product_code, quantity) VALUES ('" + productCode + "', " + quantity + ")");
+                                stmt.executeUpdate("INSERT INTO detallepedido VALUES ('" + cproducto + "', " + cantidad + ")");
                             } else {
                                 System.out.println("No hay suficiente stock para el producto.");
                             }
