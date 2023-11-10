@@ -46,7 +46,9 @@ public class MiPrograma {
                                 stmt.executeUpdate("UPDATE stock SET cantidad = cantidad - " + cantidadped + " WHERE cproducto = '" + cproducto + "'");
 
                                 // Insert en Detalle-Pedido
-                                stmt.executeUpdate("INSERT INTO detallepedido VALUES ('" + cproducto + "', " + cantidadped + ")");
+                                System.out.println("Introduzca el código del pedido:");
+                                String nuevopedido = System.console().readLine();
+                                stmt.executeUpdate("INSERT INTO detallepedido VALUES ('" + nuevopedido + "', '" + cproducto + "', " + cantidadped + ")");
                             } else {
                                 System.out.println("No hay suficiente stock para el producto.");
                             }
