@@ -25,14 +25,13 @@ public class MiPrograma {
                 System.out.println("2. Eliminar todos los detalles del producto");
                 System.out.println("3. Cancelar pedido");
                 System.out.println("4. Finalizar pedido");
-                System.out.println("5. Salir");
 
                 // Leer la opción ingresada por el usuario
                 int opcion = Integer.parseInt(System.console().readLine());
 
                 switch (opcion) {
                     case 1:
-                        / Añadir detalle de producto
+                        // Añadir detalle de producto
                         System.out.println("Introduzca el código del producto:");
                         String cproducto = System.console().readLine();
                         System.out.println("Introduzca la cantidad:");
@@ -57,31 +56,23 @@ public class MiPrograma {
                         break;
                     case 2:
                         // Eliminar todos los detalles del producto
-                        System.out.println("Introduzca el código del producto:");
-                        String productCodeToDelete = System.console().readLine();
-                        stmt.executeUpdate("DELETE FROM detallepedido WHERE product_code = '" + productCodeToDelete + "'");
-                        break;
+                        System.out.println("Introduzca el código del pedido:");
+                        String pedido = System.console().readLine();
+                        stmt.executeUpdate("DELETE FROM Detalle-Pedido WHERE cpedido = '" + pedido + "'");
                     case 3:
-                        // Añadir 10 tuplas a Stock
-                        for (int i = 0; i < 10; i++) {
-                            stmt.executeUpdate("INSERT INTO stock VALUES ('P" + i + "', " + i + ")");
-                        }
-                        break; // Se agregó la declaración break para salir del case 3
-                    case 4:
-                        // Eliminar tuplas de Stock
-                        System.out.println("Introduzca el código producto:");
-                        String codeToDelete = System.console().readLine();
-                        System.out.println("Introduzca la cantidad:");
-                        int quantityToDelete = Integer.parseInt(System.console().readLine());
-                        stmt.executeUpdate("DELETE FROM stock WHERE product_code = '" + codeToDelete + "' AND stock = " + quantityToDelete);
+                        // Eliminar pedido y todos sus detalles
+                        System.out.println("Introduzca el código del pedido:");
+                        String cpedido = System.console().readLine();
+                        stmt.executeUpdate("DELETE FROM Detalle-Pedido WHERE cpedido = '" + cpedido + "'");
+                        stmt.executeUpdate("DELETE FROM Pedidos WHERE cpedido = '" + cpedido + "'");
                         break;
-                    case 5:
-                        // Salir del programa
-                        System.exit(0);
+                    case 4:
+                        // Hacer cambios permanentes
+                        conn.commit();
                         break;
                     default:
-                        // Mensaje para opciones no válidas
-                        System.out.println("Opción no válida");
+                        // Salir del programa
+                        System.exit(0);
                         break;
                 }
             }
