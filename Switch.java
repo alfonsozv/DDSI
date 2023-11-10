@@ -59,7 +59,7 @@ public class MiPrograma {
                         String campo1 = System.console().readLine();
                         System.out.println("Introduzca la cantidad:");
                         String campo2 = System.console().readLine();
-                        stmt.executeUpdate("DELETE FROM stock WHERE campo1 = '" + campo1 + "' AND campo2 = '" + campo2 + "'");
+                        stmt.executeUpdate("DELETE FROM stock WHERE cproducto = '" + campo1 + "' AND cantidad = '" + campo2 + "'");
                     case 5:
                         // Salir del programa
                         System.exit(0);
