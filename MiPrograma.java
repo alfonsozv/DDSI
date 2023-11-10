@@ -11,6 +11,10 @@ public class MiPrograma {
         ResultSet rs = null;
         
         try {
+
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+
+
             // Establecer la conexión a la base de datos
             conn = DriverManager.getConnection(url, user, password);
             // Crear una declaración SQL para ejecutar comandos
