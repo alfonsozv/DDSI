@@ -11,7 +11,6 @@ public class MiPrograma {
         ResultSet rs = null;
 
         try {
-            // Cargar el controlador JDBC
             Class.forName("oracle.jdbc.driver.OracleDriver");
 
             // Establecer la conexión a la base de datos
@@ -22,51 +21,59 @@ public class MiPrograma {
             // Menú principal del programa
             while (true) {
                 System.out.println("Seleccione una opción:");
-                System.out.println("1. Mostrar tabla");
-                System.out.println("2. Insertar registro");
-                System.out.println("3. Modificar registro");
-                System.out.println("4. Eliminar registro");
+                System.out.println("1. Añadir detalle de producto");
+                System.out.println("2. Eliminar todos los detalles del producto");
+                System.out.println("3. Cancelar pedido");
+                System.out.println("4. Finalizar pedido");
                 System.out.println("5. Salir");
+
                 // Leer la opción ingresada por el usuario
-                int opcion;
-                try {
-                    opcion = Integer.parseInt(System.console().readLine());
-                } catch (NumberFormatException e) {
-                    System.out.println("Por favor, ingrese un número válido.");
-                    continue;
-                }
+                int opcion = Integer.parseInt(System.console().readLine());
 
                 switch (opcion) {
                     case 1:
-                        // Mostrar todos los registros de la tabla
-                        rs = stmt.executeQuery("SELECT * FROM tabla");
-                        while (rs.next()) {
-                            System.out.println(rs.getString(1) + " " + rs.getString(2));
+                        // Añadir detalle de producto
+                        System.out.println("Introduzca el código del producto:");
+                        String productCode = System.console().readLine();
+                        System.out.println("Introduzca la cantidad:");
+                        int quantity = Integer.parseInt(System.console().readLine());
+
+                        // Comprobar si hay suficiente stock
+                        rs = stmt.executeQuery("SELECT stock FROM stock WHERE product_code = '" + productCode + "'");
+                        if (rs.next()) {
+                            int stock = rs.getInt(1);
+                            if (stock >= quantity) {
+                                // Actualizar Stock
+                                stmt.executeUpdate("UPDATE stock SET stock = stock - " + quantity + " WHERE product_code = '" + productCode + "'");
+
+                                // Insert en Detalle-Pedido
+                                stmt.executeUpdate("INSERT INTO detallepedido (product_code, quantity) VALUES ('" + productCode + "', " + quantity + ")");
+                            } else {
+                                System.out.println("No hay suficiente stock para el producto.");
+                            }
+                        } else {
+                            System.out.println("El producto no existe.");
                         }
                         break;
                     case 2:
-                        // Insertar un nuevo registro en la tabla
-                        System.out.println("Introduzca el valor del campo 1:");
-                        String campo1 = System.console().readLine();
-                        System.out.println("Introduzca el valor del campo 2:");
-                        String campo2 = System.console().readLine();
-                        stmt.executeUpdate("INSERT INTO tabla VALUES ('" + campo1 + "', '" + campo2 + "')");
+                        // Eliminar todos los detalles del producto
+                        System.out.println("Introduzca el código del producto:");
+                        String productCodeToDelete = System.console().readLine();
+                        stmt.executeUpdate("DELETE FROM detallepedido WHERE product_code = '" + productCodeToDelete + "'");
                         break;
                     case 3:
-                        // Modificar un registro existente en la tabla
-                        System.out.println("Introduzca el valor del campo 1 del registro a modificar:");
-                        String campo1Antiguo = System.console().readLine();
-                        System.out.println("Introduzca el valor del campo 1 nuevo:");
-                        String campo1Nuevo = System.console().readLine();
-                        System.out.println("Introduzca el valor del campo 2 nuevo:");
-                        String campo2Nuevo = System.console().readLine();
-                        stmt.executeUpdate("UPDATE tabla SET campo1='" + campo1Nuevo + "', campo2='" + campo2Nuevo + "' WHERE campo1='" + campo1Antiguo + "'");
-                        break;
+                        // Añadir 10 tuplas a Stock
+                        for (int i = 0; i < 10; i++) {
+                            stmt.executeUpdate("INSERT INTO stock VALUES ('P" + i + "', " + i + ")");
+                        }
+                        break; // Se agregó la declaración break para salir del case 3
                     case 4:
-                        // Eliminar un registro de la tabla
-                        System.out.println("Introduzca el valor del campo 1 del registro a eliminar:");
-                        String campo1Eliminar = System.console().readLine();
-                        stmt.executeUpdate("DELETE FROM tabla WHERE campo1='" + campo1Eliminar + "'");
+                        // Eliminar tuplas de Stock
+                        System.out.println("Introduzca el código producto:");
+                        String codeToDelete = System.console().readLine();
+                        System.out.println("Introduzca la cantidad:");
+                        int quantityToDelete = Integer.parseInt(System.console().readLine());
+                        stmt.executeUpdate("DELETE FROM stock WHERE product_code = '" + codeToDelete + "' AND stock = " + quantityToDelete);
                         break;
                     case 5:
                         // Salir del programa
