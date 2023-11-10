@@ -9,17 +9,16 @@ public class MiPrograma {
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
-        
+
         try {
-
+            // Cargar el controlador JDBC
             Class.forName("oracle.jdbc.driver.OracleDriver");
-
 
             // Establecer la conexión a la base de datos
             conn = DriverManager.getConnection(url, user, password);
             // Crear una declaración SQL para ejecutar comandos
             stmt = conn.createStatement();
-            
+
             // Menú principal del programa
             while (true) {
                 System.out.println("Seleccione una opción:");
@@ -29,8 +28,14 @@ public class MiPrograma {
                 System.out.println("4. Eliminar registro");
                 System.out.println("5. Salir");
                 // Leer la opción ingresada por el usuario
-                int opcion = Integer.parseInt(System.console().readLine());
-                
+                int opcion;
+                try {
+                    opcion = Integer.parseInt(System.console().readLine());
+                } catch (NumberFormatException e) {
+                    System.out.println("Por favor, ingrese un número válido.");
+                    continue;
+                }
+
                 switch (opcion) {
                     case 1:
                         // Mostrar todos los registros de la tabla
@@ -73,9 +78,9 @@ public class MiPrograma {
                         break;
                 }
             }
-        } catch (SQLException e) {
-            // Manejar errores de SQL
-            System.out.println("Error de SQL: " + e.getMessage());
+        } catch (ClassNotFoundException | SQLException e) {
+            // Manejar errores de carga del controlador y SQL
+            System.out.println("Error: " + e.getMessage());
         } finally {
             // Cerrar recursos (ResultSet, Statement, Connection) en el bloque finally
             try {
