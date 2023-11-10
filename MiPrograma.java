@@ -5,7 +5,7 @@ import java.sql.*;
 
 public class MiPrograma {
     public static void main(String[] args) {
-        String url = "jdbc:oracle:thin:@practbd.oracle0.ugr.es:1521:practbd";
+        String url = "jdbc:oracle:thin:@//oracle0.ugr.es:1521/practbd.oracle0.ugr.es";
         String user = "x7244926";
         String password = "x7244926";
         Connection conn = null;
