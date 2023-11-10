@@ -35,18 +35,18 @@ public class MiPrograma {
                         System.out.println("Introduzca el código del producto:");
                         String cproducto = System.console().readLine();
                         System.out.println("Introduzca la cantidad:");
-                        int cantidad = Integer.parseInt(System.console().readLine());
+                        int cantidadped = Integer.parseInt(System.console().readLine());
 
                         // Comprobar si hay suficiente stock
-                        rs = stmt.executeQuery("SELECT stock FROM stock WHERE cproducto = '" + cproducto + "'");
+                        rs = stmt.executeQuery("SELECT cantidad FROM stock WHERE cproducto = '" + cproducto + "'");
                         if (rs.next()) {
                             int stock = rs.getInt(1);
-                            if (stock >= cantidad) {
+                            if (stock >= cantidadped) {
                                 // Actualizar Stock
-                                stmt.executeUpdate("UPDATE stock SET stock = stock - " + cantidad + " WHERE cproducto = '" + cproducto + "'");
+                                stmt.executeUpdate("UPDATE stock SET cantidad = cantidad - " + cantidadped + " WHERE cproducto = '" + cproducto + "'");
 
                                 // Insert en Detalle-Pedido
-                                stmt.executeUpdate("INSERT INTO detallepedido VALUES ('" + cproducto + "', " + cantidad + ")");
+                                stmt.executeUpdate("INSERT INTO detallepedido VALUES ('" + cproducto + "', " + cantidadped + ")");
                             } else {
                                 System.out.println("No hay suficiente stock para el producto.");
                             }
