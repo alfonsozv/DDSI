@@ -72,7 +72,7 @@ public class MiPrograma {
                         break;
                     default:
                         // Salir del programa
-                        System.out.exit(0);
+                        System.exit(0);
                         break;
                 }
             }
