@@ -15,6 +15,7 @@ public class MiPrograma {
 
             // Establecer la conexión a la base de datos
             conn = DriverManager.getConnection(url, user, password);
+            conn.setAutoCommit(false);
             // Crear una declaración SQL para ejecutar comandos
             stmt = conn.createStatement();
 
@@ -24,10 +25,11 @@ public class MiPrograma {
                 System.out.println("1. Reincicio de tablas y stock");
                 System.out.println("2. Dar de alta nuevo pedido");
                 System.out.println("3. Mostrar contenido de las tablas de la base de datos");
-                System.out.println("4. Salir del programa");
+                System.out.println("4. Salir del programa\n");
 
                 int op = Integer.parseInt(System.console().readLine());
                 
+                outerSwitch:
                 switch (op) {
                     case 1:
                         // Borrar las tablas si existen
@@ -54,12 +56,14 @@ public class MiPrograma {
                         break;
                 
                     case 2:
+                        // Dar de alta un nuevo pedido
+                        while(true){
                         System.out.println("Seleccione una opción  para el pedido:");
                         System.out.println("1. Crear nuevo pedido");
                         System.out.println("2. Añadir detalle de producto");
                         System.out.println("3. Eliminar todos los detalles del producto");
                         System.out.println("4. Cancelar pedido");
-                        System.out.println("5. Finalizar pedido");
+                        System.out.println("5. Finalizar pedido\n");
 
                         // Leer la opción ingresada por el usuario
                         int opcion = Integer.parseInt(System.console().readLine());
@@ -83,7 +87,8 @@ public class MiPrograma {
 
                                 // Insertar en Pedidos
                                 stmt.executeUpdate("INSERT INTO pedido VALUES ('" + newpedido + "', '" + cliente + "',  TO_DATE('" + fecha + "', 'DD/MM/YYYY'))");
-                                System.out.println("Pedido creado correctamente.");
+                                System.out.println("Pedido creado correctamente.\n");
+                                
                                 break;
                                 
                             case 2:
@@ -108,27 +113,47 @@ public class MiPrograma {
                                         //El pedido debe existir para poder añadirle un producto
                                         rs = stmt.executeQuery("SELECT cpedido FROM pedido WHERE cpedido = '" + nuevopedido + "'");
                                         if (!rs.next()) {
-                                            System.out.println("El pedido no existe.");
+                                            System.out.println("El pedido no existe.\n");
                                             break;
                                         }
-                                        System.out.println("1.");  
+                                         
                                         //Introducimos los detalles del pedido
                                         stmt.executeUpdate("INSERT INTO detallepedido VALUES ('" + nuevopedido + "', '" + cproducto + "', " + cantidadped + ")");
-                                        System.out.println("2");
-                                        System.out.println("Producto añadido correctamente al pedido.");
+                                        System.out.println("Producto añadido correctamente al pedido.\n");
+
+                                        // Mostrar el pedido actual
+                                        System.out.println("Detalles del pedido:");
+                                        rs = stmt.executeQuery("SELECT * FROM detallepedido WHERE cpedido = '" + nuevopedido + "'");
+                                        while (rs.next()) {
+                                            System.out.println("Código de Pedido: " + rs.getString("cpedido") +
+                                                            ", Código de Producto: " + rs.getString("cproducto") +
+                                                            ", Cantidad: " + rs.getInt("cantidad"));
+                                        }
+
                                     } else {
-                                        System.out.println("No hay suficiente stock para el producto.");
+                                        System.out.println("No hay suficiente stock para el producto.\n");
                                     }
                                 } else {
-                                    System.out.println("El producto no existe.");
+                                    System.out.println("El producto no existe.\n");
                                 }
+                                System.out.println("\n");
                                 break;
                             case 3:
-                                // Eliminar todos los detalles del producto
-                                System.out.println("Introduzca el código del producto:");
-                                String producto = System.console().readLine();
-                                stmt.executeUpdate("DELETE detallepedido WHERE cproducto = '" + producto + "'");
-                                System.out.println("Producto eliminado del pedido.\n");
+                                // Eliminar todos los detalles del pedido
+                                System.out.println("Introduzca el código del pedido:");
+                                String pedido = System.console().readLine();
+                                stmt.executeUpdate("DELETE detallepedido WHERE cpedido = '" + pedido + "'");
+                                System.out.println("Detalles del pedido eliminados.\n");
+
+                                // Mostrar el pedido actual
+                                System.out.println("Detalles del pedido:");
+                                rs = stmt.executeQuery("SELECT * FROM pedido WHERE cpedido = '" + pedido + "'");
+                                while (rs.next()) {
+                                    System.out.println("Código de Pedido: " + rs.getString("cpedido") +
+                                                    ", Código de Cliente: " + rs.getString("cliente") + ", Fecha: " + rs.getDate("fechapedido"));
+                                }
+                                System.out.println("\n");
+
                                 break;
                             case 4:
                                 // Eliminar pedido y todos sus detalles
@@ -137,19 +162,27 @@ public class MiPrograma {
                                 stmt.executeUpdate("DELETE detallepedido WHERE cpedido = '" + cpedido + "'");
                                 stmt.executeUpdate("DELETE pedido WHERE cpedido = '" + cpedido + "'");
                                 System.out.println("Pedido cancelado correctamente.\n");
-                                break;
+
+                                //Mostrar pedidos actuales
+                                System.out.println("Pedidos actuales:");
+                                rs = stmt.executeQuery("SELECT * FROM pedido");
+                                while (rs.next()) {
+                                    System.out.println("Código de Pedido: " + rs.getString("cpedido") +
+                                                    ", Código de Cliente: " + rs.getString("cliente") + ", Fecha: " + rs.getDate("fechapedido"));
+                                }
+                                System.out.println("\n");
+                                break outerSwitch;
                             case 5:
                                 // Hacer cambios permanentes
                                 conn.commit();
                                 System.out.println("Pedido finalizado.\n");
-                                break;
+                                break outerSwitch;
                             default:
-                                // Salir del programa
-                                System.exit(0);
                                 break;
                         }  
-                        break;
-
+                        }
+                        
+                    
                     case 3:
                         // Mostrar todas las tablas
 
@@ -164,6 +197,17 @@ public class MiPrograma {
                         }
                         System.out.println("-----------------------------\n");
 
+                        
+                        // Mostrar contenido de la tabla Pedidos
+                        System.out.println("Contenido de la tabla Pedidos:");
+                        rs = stmt.executeQuery("SELECT * FROM pedido");
+                        while (rs.next()) {
+                            System.out.println("Código de Pedido: " + rs.getString("cpedido") +
+                                            ", Código de Cliente: " + rs.getString("cliente") + ", Fecha: " + rs.getDate("fechapedido"));
+                        }
+                        
+                        System.out.println("-----------------------------\n");
+
                         // Mostrar contenido de la tabla DetallePedido
                         System.out.println("Contenido de la tabla DetallePedido:");
                         rs = stmt.executeQuery("SELECT * FROM detallepedido");
@@ -171,15 +215,6 @@ public class MiPrograma {
                             System.out.println("Código de Pedido: " + rs.getString("cpedido") +
                                             ", Código de Producto: " + rs.getString("cproducto") +
                                             ", Cantidad: " + rs.getInt("cantidad"));
-                        }
-                        System.out.println("-----------------------------\n");
-
-                        // Mostrar contenido de la tabla Pedidos
-                        System.out.println("Contenido de la tabla Pedidos:");
-                        rs = stmt.executeQuery("SELECT * FROM pedido");
-                        while (rs.next()) {
-                            System.out.println("Código de Pedido: " + rs.getString("cpedido") +
-                                            ", Código de Cliente: " + rs.getString("ccliente") + ", Fecha: " + rs.getDate("fecha"));
                         }
                         System.out.println("-----------------------------\n");
 
@@ -197,7 +232,7 @@ public class MiPrograma {
                         break;
                 }
 
-
+                rs.close();
                 
             }
         } catch (ClassNotFoundException | SQLException e) {
