@@ -153,51 +153,38 @@ public class MiPrograma {
                     case 3:
                         // Mostrar todas las tablas
 
-                        System.out.println("1.  Para mostrar el contenido de la tabla stock");
-                        System.out.println("2.  Para mostrar el contenido de la tabla DetallePedido");
-                        System.out.println("3.  Para mostrar el contenido de la tabla Pedidos");
+                        System.out.println("CONTENIDO DE LAS TABLAS: \n");
 
-                        int caso = Integer.parseInt(System.console().readLine());
+                        // Mostrar contenido de la tabla stock
+                        System.out.println("Contenido de la tabla stock:");
+                        rs = stmt.executeQuery("SELECT * FROM stock");
+                        while (rs.next()) {
+                            System.out.println("Código de Producto: " + rs.getString("cproducto") +
+                                            ", Cantidad en Stock: " + rs.getInt("cantidad"));
+                        }
+                        System.out.println("-----------------------------\n");
 
-                        switch(caso) {
+                        // Mostrar contenido de la tabla DetallePedido
+                        System.out.println("Contenido de la tabla DetallePedido:");
+                        rs = stmt.executeQuery("SELECT * FROM detallepedido");
+                        while (rs.next()) {
+                            System.out.println("Código de Pedido: " + rs.getString("cpedido") +
+                                            ", Código de Producto: " + rs.getString("cproducto") +
+                                            ", Cantidad: " + rs.getInt("cantidad"));
+                        }
+                        System.out.println("-----------------------------\n");
 
-                            case 1:
-                            // Mostrar contenido de la tabla stock
-                            System.out.println("Contenido de la tabla stock:");
-                            rs = stmt.executeQuery("SELECT * FROM stock");
-                            while (rs.next()) {
-                                System.out.println("Código de Producto: " + rs.getString("cproducto") +
-                                                ", Cantidad en Stock: " + rs.getInt("cantidad"));
-                            }
-                            System.out.println();
-                            break;
-
-                            case 2:
-                            // Mostrar contenido de la tabla DetallePedido
-                            System.out.println("Contenido de la tabla DetallePedido:");
-                            rs = stmt.executeQuery("SELECT * FROM detallepedido");
-                            while (rs.next()) {
-                                System.out.println("Código de Pedido: " + rs.getString("cpedido") +
-                                                ", Código de Producto: " + rs.getString("cproducto") +
-                                                ", Cantidad: " + rs.getInt("cantidad"));
-                            }
-                            System.out.println();
-                            break;
-
-                            case 3:
-                            // Mostrar contenido de la tabla Pedidos
-                            System.out.println("Contenido de la tabla Pedidos:");
-                            rs = stmt.executeQuery("SELECT * FROM pedido");
-                            while (rs.next()) {
-                                System.out.println("Código de Pedido: " + rs.getString("cpedido") +
-                                                ", Código de Cliente: " + rs.getString("ccliente") + ", Fecha: " + rs.getDate("fecha"));
-                            }
-                            System.out.println();
-                            break;
-
-                        };
+                        // Mostrar contenido de la tabla Pedidos
+                        System.out.println("Contenido de la tabla Pedidos:");
+                        rs = stmt.executeQuery("SELECT * FROM pedido");
+                        while (rs.next()) {
+                            System.out.println("Código de Pedido: " + rs.getString("cpedido") +
+                                            ", Código de Cliente: " + rs.getString("ccliente") + ", Fecha: " + rs.getDate("fecha"));
+                        }
+                        System.out.println("-----------------------------\n");
 
                         break;
+
                     case 4:
                         // Salir del programa
                         System.out.println("Saliendo del programa...");
