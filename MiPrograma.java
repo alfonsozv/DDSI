@@ -31,26 +31,26 @@ public class MiPrograma {
                 switch (op) {
                     case 1:
                         // Borrar las tablas si existen
+                        
                         System.out.println("Borrando tablas...");
-                        stmt.execute("DROP TABLE detallepedido;");
-                        System.out.println("1");
-                        stmt.execute("DROP TABLE pedido;");
-                        System.out.println("2");
-                        stmt.execute("DROP TABLE stock;");
+                        stmt.executeUpdate("DROP TABLE detallepedido");
+                        stmt.executeUpdate("DROP TABLE pedido");
+                        stmt.executeUpdate("DROP TABLE stock");
                         System.out.println("Tablas borradas correctamente.\n");
-
+                        
                         // Crear las tablas
                         System.out.println("Creando tablas...");
-                        stmt.execute("CREATE TABLE stock (cproducto VARCHAR2(15), CONSTRAINT cpro_clave_primaria PRIMARY KEY, cantidad NUMBER(5));");
-                        stmt.execute("CREATE TABLE pedido (cpedido VARCHAR2(15) CONSTRAINT cliente_obligatorio NOT NULL, cliente VARCHAR2(15), fechapedido DATE default sysdate);");
-                        stmt.execute("CREATE TABLE detallepedido(cpedido REFERENCES pedido(cpedido), cproducto REFERENCES stock(cproducto), cantidad NUMBER()5), PRIMARY KEY(cpedido, cproducto);");
+                        stmt.executeUpdate("CREATE TABLE stock(cproducto VARCHAR2(15) CONSTRAINT cpro_clave_primaria PRIMARY KEY, cantidad NUMBER(5))");
+                        stmt.executeUpdate("CREATE TABLE pedido(cpedido VARCHAR2(15) CONSTRAINT cped_clave_primaria PRIMARY KEY, cliente VARCHAR2(15) CONSTRAINT cliente_obligatorio NOT NULL, fechapedido DATE default sysdate)");
+                        stmt.executeUpdate("CREATE TABLE detallepedido(cpedido REFERENCES pedido(cpedido), cproducto REFERENCES stock(cproducto), cantidad NUMBER(5), PRIMARY KEY(cpedido, cproducto))");
                         System.out.println("Tablas creadas correctamente.\n");
                            
                         // Insertar 10 tuplas predefinidas en la tabla Stock
                         System.out.println("Insertando tuplas predefinidas en la tabla Stock...");
                         for (int i = 1; i <= 10; i++) {
-                            stmt.executeUpdate("INSERT INTO stock VALUES ('P" + i + "', " + (i * 10) + ");");
+                            stmt.executeUpdate("INSERT INTO stock VALUES ('P" + i + "', " + (i * 10) + ")");
                         }
+                        System.out.println("Tuplas insertadas correctamente\n");
                         break;
                 
                     case 2:
