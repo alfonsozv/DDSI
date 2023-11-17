@@ -2,7 +2,6 @@ import java.sql.*;
 
 public class MiPrograma {
     public static void main(String[] args) {
-        // Información de conexión a la base de datos Oracle
         String url = "jdbc:oracle:thin:@//oracle0.ugr.es:1521/practbd.oracle0.ugr.es";
         String user = "x7244926";
         String password = "x7244926";
@@ -12,27 +11,22 @@ public class MiPrograma {
 
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
-
-            // Establecer la conexión a la base de datos
             conn = DriverManager.getConnection(url, user, password);
             conn.setAutoCommit(false);
-            // Crear una declaración SQL para ejecutar comandos
             stmt = conn.createStatement();
 
-            // Menú principal del programa
             while (true) {
                 System.out.println("Seleccione una opción:");
-                System.out.println("1. Reincicio de tablas y stock");
+                System.out.println("1. Reincio de tablas y stock");
                 System.out.println("2. Dar de alta nuevo pedido");
                 System.out.println("3. Mostrar contenido de las tablas de la base de datos");
                 System.out.println("4. Salir del programa\n");
 
                 int op = Integer.parseInt(System.console().readLine());
-                
-                outerSwitch:
+
                 switch (op) {
-                    case 1:
-                        // Borrar las tablas si existen
+                    case 1:    
+                    // Borrar las tablas si existen
                         
                         System.out.println("Borrando tablas...");
                         stmt.executeUpdate("DROP TABLE detallepedido");
@@ -55,134 +49,103 @@ public class MiPrograma {
                         System.out.println("Tuplas insertadas correctamente\n");
                         break;
                 
-                    case 2:
-                        // Dar de alta un nuevo pedido
-                        while(true){
-                        System.out.println("Seleccione una opción  para el pedido:");
-                        System.out.println("1. Crear nuevo pedido");
-                        System.out.println("2. Añadir detalle de producto");
-                        System.out.println("3. Eliminar todos los detalles del producto");
-                        System.out.println("4. Cancelar pedido");
-                        System.out.println("5. Finalizar pedido\n");
-
-                        // Leer la opción ingresada por el usuario
-                        int opcion = Integer.parseInt(System.console().readLine());
-
-                        switch (opcion) {
-                            case 1:
-                                //Crear nuevo pedido
-                                System.out.println("Introduzca su código de cliente:");
-                                String cliente = System.console().readLine();
-                                System.out.println("Introduzca el código del pedido:");
-                                String newpedido = System.console().readLine();
-                                System.out.println("Introduzca la fecha del pedido:");
-                                String fecha = System.console().readLine();
-                                
-                                //Comprobar si el pedido existe
-                                rs = stmt.executeQuery("SELECT cpedido FROM pedido WHERE cpedido = '" + newpedido + "'");
-                                if (rs.next()) {
-                                    System.out.println("El pedido ya existe.");
-                                    break;
-                                }
-
-                                // Insertar en Pedidos
-                                stmt.executeUpdate("INSERT INTO pedido VALUES ('" + newpedido + "', '" + cliente + "',  TO_DATE('" + fecha + "', 'DD/MM/YYYY'))");
-                                System.out.println("Pedido creado correctamente.\n");
-                                
-                                break;
-                                
-                            case 2:
-                                // Añadir detalle de producto
-                                System.out.println("Introduzca el código del producto:");
-                                String cproducto = System.console().readLine();
-                                System.out.println("Introduzca la cantidad:");
-                                int cantidadped = Integer.parseInt(System.console().readLine());
-
-                                // Comprobar si hay suficiente stock
-                                rs = stmt.executeQuery("SELECT cantidad FROM stock WHERE cproducto = '" + cproducto + "'");
-                                if (rs.next()) {
-                                    int stock = rs.getInt(1);
-                                    if (stock >= cantidadped) {
-                                        // Actualizar Stock
-                                        stmt.executeUpdate("UPDATE stock SET cantidad = cantidad - " + cantidadped + " WHERE cproducto = '" + cproducto + "'");
-
-                                        // Insert en Detalle-Pedido
-                                        System.out.println("Introduzca el código de su pedido:");
-                                        String nuevopedido = System.console().readLine();
-                                        
-                                        //El pedido debe existir para poder añadirle un producto
-                                        rs = stmt.executeQuery("SELECT cpedido FROM pedido WHERE cpedido = '" + nuevopedido + "'");
-                                        if (!rs.next()) {
-                                            System.out.println("El pedido no existe.\n");
-                                            break;
-                                        }
-                                         
-                                        //Introducimos los detalles del pedido
-                                        stmt.executeUpdate("INSERT INTO detallepedido VALUES ('" + nuevopedido + "', '" + cproducto + "', " + cantidadped + ")");
-                                        System.out.println("Producto añadido correctamente al pedido.\n");
-
-                                        // Mostrar el pedido actual
-                                        System.out.println("Detalles del pedido:");
-                                        rs = stmt.executeQuery("SELECT * FROM detallepedido WHERE cpedido = '" + nuevopedido + "'");
-                                        while (rs.next()) {
-                                            System.out.println("Código de Pedido: " + rs.getString("cpedido") +
-                                                            ", Código de Producto: " + rs.getString("cproducto") +
-                                                            ", Cantidad: " + rs.getInt("cantidad"));
-                                        }
-
-                                    } else {
-                                        System.out.println("No hay suficiente stock para el producto.\n");
-                                    }
-                                } else {
-                                    System.out.println("El producto no existe.\n");
-                                }
-                                System.out.println("\n");
-                                break;
-                            case 3:
-                                // Eliminar todos los detalles del pedido
-                                System.out.println("Introduzca el código del pedido:");
-                                String pedido = System.console().readLine();
-                                stmt.executeUpdate("DELETE detallepedido WHERE cpedido = '" + pedido + "'");
-                                System.out.println("Detalles del pedido eliminados.\n");
-
-                                // Mostrar el pedido actual
-                                System.out.println("Detalles del pedido:");
-                                rs = stmt.executeQuery("SELECT * FROM pedido WHERE cpedido = '" + pedido + "'");
-                                while (rs.next()) {
-                                    System.out.println("Código de Pedido: " + rs.getString("cpedido") +
-                                                    ", Código de Cliente: " + rs.getString("cliente") + ", Fecha: " + rs.getDate("fechapedido"));
-                                }
-                                System.out.println("\n");
-
-                                break;
-                            case 4:
-                                // Eliminar pedido y todos sus detalles
-                                System.out.println("Introduzca el código del pedido:");
-                                String cpedido = System.console().readLine();
-                                stmt.executeUpdate("DELETE detallepedido WHERE cpedido = '" + cpedido + "'");
-                                stmt.executeUpdate("DELETE pedido WHERE cpedido = '" + cpedido + "'");
-                                System.out.println("Pedido cancelado correctamente.\n");
-
-                                //Mostrar pedidos actuales
-                                System.out.println("Pedidos actuales:");
-                                rs = stmt.executeQuery("SELECT * FROM pedido");
-                                while (rs.next()) {
-                                    System.out.println("Código de Pedido: " + rs.getString("cpedido") +
-                                                    ", Código de Cliente: " + rs.getString("cliente") + ", Fecha: " + rs.getDate("fechapedido"));
-                                }
-                                System.out.println("\n");
-                                break outerSwitch;
-                            case 5:
-                                // Hacer cambios permanentes
-                                conn.commit();
-                                System.out.println("Pedido finalizado.\n");
-                                break outerSwitch;
-                            default:
-                                break;
-                        }  
-                        }
+                        case 2:
+                        System.out.println("Seleccione una opción para el pedido:");
+                        int opcionPedido = Integer.parseInt(System.console().readLine());
+                        Savepoint savepoint1 = null;
                         
-                    
+                        try {
+                            switch (opcionPedido) {
+                                case 1:
+                                    // Crear nuevo pedido
+                                    System.out.println("Introduzca su código de cliente:");
+                                    String cliente = System.console().readLine();
+                                    System.out.println("Introduzca el código del pedido:");
+                                    String newpedido = System.console().readLine();
+                                    System.out.println("Introduzca la fecha del pedido:");
+                                    String fecha = System.console().readLine();
+                                    
+                                    savepoint1 = conn.setSavepoint("SavepointCrearPedido");
+                                    
+                                    // Comprobar si el pedido existe
+                                    rs = stmt.executeQuery("SELECT cpedido FROM pedido WHERE cpedido = '" + newpedido + "'");
+                                    if (rs.next()) {
+                                        System.out.println("El pedido ya existe.");
+                                        break;
+                                    }
+                                    
+                                    // Insertar en Pedidos
+                                    stmt.executeUpdate("INSERT INTO pedido (cpedido, cliente, fechapedido) VALUES ('" + newpedido + "', '" + cliente + "', TO_DATE('" + fecha + "', 'DD/MM/YYYY'))");
+                                    System.out.println("Pedido creado correctamente.\n");
+                                    break;
+                                
+                                case 2:
+                                    // Añadir detalle de producto al pedido
+                                    System.out.println("Introduzca el código del pedido:");
+                                    String pedidoDetalle = System.console().readLine();
+                                    System.out.println("Introduzca el código del producto:");
+                                    String cproducto = System.console().readLine();
+                                    System.out.println("Introduzca la cantidad:");
+                                    int cantidad = Integer.parseInt(System.console().readLine());
+                                    
+                                    savepoint1 = conn.setSavepoint("SavepointAnadirDetalle");
+                                    
+                                    // Insertar detalle de pedido
+                                    stmt.executeUpdate("INSERT INTO detallepedido (cpedido, cproducto, cantidad) VALUES ('" + pedidoDetalle + "', '" + cproducto + "', " + cantidad + ")");
+                                    System.out.println("Detalle de producto añadido correctamente al pedido.\n");
+                                    break;
+                                
+                                case 3:
+                                    // Eliminar todos los detalles del producto de un pedido
+                                    System.out.println("Introduzca el código del pedido para eliminar detalles:");
+                                    String pedidoEliminar = System.console().readLine();
+                                    
+                                    savepoint1 = conn.setSavepoint("SavepointEliminarDetalles");
+                                    
+                                    // Eliminar detalles del pedido
+                                    stmt.executeUpdate("DELETE FROM detallepedido WHERE cpedido = '" + pedidoEliminar + "'");
+                                    System.out.println("Detalles del pedido eliminados.\n");
+                                    break;
+                                
+                                case 4:
+                                    // Cancelar pedido
+                                    System.out.println("Introduzca el código del pedido para cancelar:");
+                                    String pedidoCancelar = System.console().readLine();
+                                    
+                                    savepoint1 = conn.setSavepoint("SavepointCancelarPedido");
+                                    
+                                    // Eliminar pedido y detalles del pedido
+                                    stmt.executeUpdate("DELETE FROM detallepedido WHERE cpedido = '" + pedidoCancelar + "'");
+                                    stmt.executeUpdate("DELETE FROM pedido WHERE cpedido = '" + pedidoCancelar + "'");
+                                    System.out.println("Pedido cancelado correctamente.\n");
+                                    break;
+                                
+                                case 5:
+                                    // Confirmar el pedido y hacer los cambios permanentes
+                                    conn.commit();
+                                    System.out.println("Pedido finalizado y guardado con éxito.\n");
+                                    break;
+                                
+                                default:
+                                    System.out.println("Opción no válida.");
+                                    break;
+                            }
+                        } catch (SQLException e) {
+                            System.out.println("Se produjo un error en la base de datos: " + e.getMessage());
+                            if (conn != null && savepoint1 != null) {
+                                conn.rollback(savepoint1);
+                                System.out.println("Los cambios han sido revertidos al último punto seguro.");
+                            }
+                        } finally {
+                            if (rs != null) {
+                                try {
+                                    rs.close();
+                                } catch (SQLException e) {
+                                    System.out.println("Error al cerrar ResultSet: " + e.getMessage());
+                                }
+                            }
+                        }
+                        break;
                     case 3:
                         // Mostrar todas las tablas
 
@@ -221,27 +184,39 @@ public class MiPrograma {
                         break;
 
                     case 4:
-                        // Salir del programa
                         System.out.println("Saliendo del programa...");
-                        System.exit(0);
-                        break;
+                        if (conn != null) {
+                            conn.commit();  // Asegurarse de confirmar cualquier transacción pendiente
+                        }
+                        return; // Cambiado de System.exit(0) para asegurarse de que finally se ejecute
+
                     default:
-                        // Salir del programa
                         System.out.println("Opción no válida. Saliendo del programa...");
-                        System.exit(0);
-                        break;
+                        if (conn != null) {
+                            conn.commit();  // Asegurarse de confirmar cualquier transacción pendiente
+                        }
+                        return; // Cambiado de System.exit(0) para asegurarse de que finally se ejecute
                 }
 
-                rs.close();
+                // Cerrar ResultSet después de cada ciclo si está abierto
+                if (rs != null && !rs.isClosed()) {
+                    rs.close();
+                }
                 
             }
         } catch (ClassNotFoundException | SQLException e) {
-            // Manejar errores de carga del controlador y SQL
             System.out.println("Error: " + e.getMessage());
-        } finally {
-            // Cerrar recursos (ResultSet, Statement, Connection) en el bloque finally
             try {
-                if (rs != null) rs.close();
+                if (conn != null) {
+                    conn.rollback(); // Hacer rollback de la transacción si hay un error
+                }
+            } catch (SQLException ex) {
+                System.out.println("Error al hacer rollback: " + ex.getMessage());
+            }
+        } finally {
+            // Cerrar recursos en el bloque finally
+            try {
+                if (rs != null && !rs.isClosed()) rs.close();
                 if (stmt != null) stmt.close();
                 if (conn != null) conn.close();
             } catch (SQLException e) {
